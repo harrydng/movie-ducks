@@ -1,24 +1,16 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import '../styles.css';
 import MovieCard from "./MovieCard";
 
 //This function demonstrates the movie grid that will be shown on the screen
-export default function MoviesGrid() {
+export default function MoviesGrid({movies, watchlist, toggleWatchlist}) {
 
-    //setting the movies on the screen
-    const [movies, setMovies] = useState([]);
-    //the search bar terms
+    //the term on search bar
     const [searchTerm, setSearchTerm] = useState("");
-    //filtering by genre
+    //the type of genres
     const [genre, setGenre] = useState("All Genres");
-    //filtering by rating
+    //the type of ratings
     const [rating, setRating] = useState("All Ratings");
-
-    useEffect(() => {
-        fetch("movies.json")
-            .then(response => response.json())
-            .then(data => setMovies(data))
-    }, []);
 
     //handles the searched text
     const handleSearchTerm = (e) => {
@@ -40,7 +32,6 @@ export default function MoviesGrid() {
         return genre === "All Genres" || movie.genre.toLowerCase() === genre.toLowerCase()
     };
 
-
     //check if the searched rating matches with any movie's rating
     //check the rating filter bar as Strings
     //then return the corresponding movies with that rating
@@ -48,7 +39,7 @@ export default function MoviesGrid() {
         if (rating === "Good") {
             return movie.rating >= 8;
         } else if (rating === "Ok") {
-            return movie.rating >=5 && movie.rating < 8;
+            return movie.rating >= 5 && movie.rating < 8;
         } else if (rating === "Bad") {
             return movie.rating < 5;
         } else {
@@ -62,13 +53,12 @@ export default function MoviesGrid() {
         return movie.title.toLowerCase().includes(searchTerm.toLowerCase())
     }
 
-
     //filtering the movie by looking at the movie title and the typed message
     //lower-case for case-sensitive
     const filterMovies = movies.filter((movie) =>
-        matchesGenre(movie, genre) &&
-        matchesRating(movie, rating) &&
-        matchesTitle(movie, searchTerm)
+                                           matchesGenre(movie, genre) &&
+                                           matchesRating(movie, rating) &&
+                                           matchesTitle(movie, searchTerm)
     );
 
     return (
@@ -96,7 +86,8 @@ export default function MoviesGrid() {
 
                 <div className='filter-slot'>
                     <label>Rating</label>
-                    <select className='filter-dropdown' value={rating} onChange={handleRatingChange}>
+                    <select className='filter-dropdown' value={rating}
+                            onChange={handleRatingChange}>
                         <option>All Ratings</option>
                         <option>Good</option>
                         <option>Ok</option>
@@ -108,7 +99,12 @@ export default function MoviesGrid() {
             {/*handle the movies showed on the screen*/}
             <div className='movies-grid'>
                 {filterMovies.map(movie => (
-                    <MovieCard movie={movie} key={movie.id}> </MovieCard>
+                    <MovieCard
+                        movie={movie}
+                        key={movie.id}
+                        toggleWatchlist={toggleWatchlist}
+                        isWatchlisted={watchlist.includes(movie.id)}
+                    > </MovieCard>
                 ))}
             </div>
 
